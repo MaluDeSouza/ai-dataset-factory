@@ -10,6 +10,7 @@ class Chunk(BaseModel):
     document_id: UUID
     content: str
     token_count: int = 0
+    embedding: Optional[list[float]] = None
 
 class Document(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -19,6 +20,7 @@ class Document(BaseModel):
     filename: str
     original_content: Optional[str] = None
     cleaned_content: Optional[str] = None
+    category: Optional[str] = None
     status: str = "pending"
     chunks: List[Chunk] = Field(default_factory=list)
 

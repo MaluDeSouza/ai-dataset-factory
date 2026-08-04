@@ -9,3 +9,6 @@ pytest
 pypdf
 langchain-text-splitters
 tiktoken
+openai
+python-dotenv
+google-generativeai

@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.dialects.postgresql import ARRAY, FLOAT
 
 Base = declarative_base()
 
@@ -22,6 +23,7 @@ class DocumentModel(Base):
     dataset_id = Column(UUID(as_uuid=True), ForeignKey("datasets.id", ondelete="CASCADE"), nullable=False)
     filename = Column(String, nullable=False)
     original_content = Column(Text, nullable=True)
+    category = Column(String, nullable=True)
     status = Column(String, default="pending")
     
     dataset = relationship("DatasetModel", back_populates="documents")
@@ -34,5 +36,6 @@ class ChunkModel(Base):
     document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
     content = Column(Text, nullable=False)
     token_count = Column(Integer, default=0)
+    embedding = Column(ARRAY(FLOAT), nullable=True)
     
     document = relationship("DocumentModel", back_populates="chunks")
