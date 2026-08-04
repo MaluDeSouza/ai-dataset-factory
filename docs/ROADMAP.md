@@ -55,7 +55,7 @@ Com a persistência pronta, o próximo passo é permitir que documentos reais se
 
 Nesta fase a plataforma passa a utilizar modelos de linguagem para enriquecer automaticamente os dados processados.
 
-**Branch:** `feat/pipeline-ai-processing`
+**Branch:** `feat/pipeline-rag-intelligence`
 
 ## Objetivos
 
