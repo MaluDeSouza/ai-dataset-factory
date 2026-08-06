@@ -12,3 +12,6 @@ tiktoken
 openai
 python-dotenv
 google-generativeai
+python-multipart
+alembic
+python-dotenv

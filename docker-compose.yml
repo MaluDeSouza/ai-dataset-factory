@@ -1,17 +1,11 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
-    container_name: ai_dataset_factory_db
+    container_name: dataset_factory_db
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: adminpassword
       POSTGRES_DB: dataset_factory
     ports:
       - "5435:5432"
-    volumes:
-      - ai_dataset_factory_data:/var/lib/postgresql/data
-
-volumes:
-  ai_dataset_factory_data:
+    restart: unless-stopped
