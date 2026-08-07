@@ -10,7 +10,7 @@ class ImportPipeline:
     def __init__(self, storage_provider: LocalStorageProvider):
         self.storage_provider = storage_provider
 
-    def process(self, dataset_id: UUID, filepath: str) -> Document:
+    def process(self, document_id: UUID, dataset_id: UUID, filepath: str) -> Document:
         """
         Lê o arquivo físico e converte para a entidade Document de domínio.
         """
@@ -29,12 +29,13 @@ class ImportPipeline:
         else:
             raise ValueError(f"Formato de arquivo não suportado para ingestão: {extension}")
 
-        # Retorna a entidade pura, pronta para validação e persistência
+        # Retorna a entidade pura mantendo o ID original para não duplicar no banco
         return Document(
+            id=document_id,
             dataset_id=dataset_id,
             filename=filename,
             original_content=content,
-            status="imported" # Atualiza o status indicando que passou pela ingestão
+            status="imported"
         )
 
     def _extract_text_from_pdf(self, filepath: str) -> str:

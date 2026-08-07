@@ -29,13 +29,13 @@ class ProcessDocumentUseCase:
         self.embedding_pipeline = embedding_pipeline
         self.db_session = db_session
 
-    def execute(self, dataset_id: UUID, filepath: str) -> DocumentModel:
+    def execute(self, document_id: UUID, dataset_id: UUID, filepath: str) -> DocumentModel:
         """
         Orquestra o ciclo de vida completo de um documento: leitura, limpeza, 
-        classificação, anonimização, fatiamento, vetorização e persistência.
+        classificação, anonimização, fatiamento, vetorização e atualização no banco.
         """
         
-        doc = self.import_pipeline.process(dataset_id=dataset_id, filepath=filepath)
+        doc = self.import_pipeline.process(document_id=document_id, dataset_id=dataset_id, filepath=filepath)
         doc = self.cleaning_pipeline.process(document=doc)
         doc = self.classification_pipeline.process(document=doc)
         doc = self.anonymization_pipeline.process(document=doc)
@@ -43,15 +43,21 @@ class ProcessDocumentUseCase:
         doc = self.embedding_pipeline.process(document=doc)
 
         
-        db_document = DocumentModel(
-            id=doc.id,
-            dataset_id=doc.dataset_id,
-            filename=doc.filename,
-            original_content=doc.original_content,
-            category=doc.category,
-            status=doc.status
-        )
+        doc.status = "processed"
 
+        
+        db_document = self.db_session.query(DocumentModel).filter(DocumentModel.id == document_id).first()
+        
+        if not db_document:
+            raise ValueError(f"Documento {document_id} não encontrado no banco de dados para atualização.")
+
+        
+        db_document.original_content = doc.original_content
+        db_document.cleaned_content = doc.cleaned_content
+        db_document.category = doc.category
+        db_document.status = doc.status
+
+        
         for chunk_entity in doc.chunks:
             db_chunk = ChunkModel(
                 id=chunk_entity.id,
@@ -62,8 +68,6 @@ class ProcessDocumentUseCase:
             )
             db_document.chunks.append(db_chunk)
 
-    
-        self.db_session.add(db_document)
         self.db_session.commit()
         self.db_session.refresh(db_document)
 
